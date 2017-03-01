@@ -77,7 +77,7 @@ trials = data.TrialHandler(stim_order, nReps=1, extraInfo=exp_info,
                            method='sequential', originPath=datapath)
 
 # ----------------------------------------------
-# DEFINE A TRIAL SEQUENCE
+# START THE EXPERIMENT
 # ----------------------------------------------
 
 for trial in trials:
