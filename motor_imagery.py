@@ -67,9 +67,66 @@ text = "Press spacebar to start the trial"
 # Define a list of trials with their properties:
 #   - Which image (without the suffix)
 #   - Which orientation
+
+# TODO: stim_order list, orientations?
 stim_order = []
 for im in imlist:
     stim_order.append({'im': im, 'ori': })
 
 trials = data.TrialHandler(stim_order, nReps=1, extraInfo=exp_info,
                            method='sequential', originPath=datapath)
+
+# ----------------------------------------------
+# DEFINE A TRIAL SEQUENCE
+# ----------------------------------------------
+
+for trial in trials:
+    # Display trial start text
+
+    # Wait for a spacebar press to start trial or escape to quit
+
+    # Set the images and orientation (?)
+    im_fname = os.path.join(impath, trial['im'])
+    trial['ori']
+
+    # Empty keypresses list
+    key_presses = []
+
+    # Start the trial
+
+    # Stop trial if spacebar or escape has been pressed or 30s has passed
+    while not response and time < timelimit:
+        # Switch image
+
+        # TODO: Display images
+
+        # For the duration of 'changetime,' wait for spacebar or escape press
+        while time < changetime:
+            if response:
+                break
+
+    # Aanlyze the keypress
+    if response:
+        if escape_pressed:
+            # Escape press = quit the experiment
+            break
+        elif spacebar_pressed:
+            # Spacebar press = correct change detection; register response time
+            # ???????
+            acc = 1
+            rt = timelimit
+
+    # Add the current trial's data to TrialHandler
+    trials.addData('rt', rt)
+    trials.addData('acc', acc)
+
+    # Advance to the next trial
+
+# ----------------------------------------------
+# END THE EXPERIMENT
+# ----------------------------------------------
+
+# Save all data to a file
+trials.saveAsWideText(data_fname + '.csv', delim=',')
+
+# Quit the experiment
