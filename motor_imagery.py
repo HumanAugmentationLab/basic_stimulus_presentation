@@ -2,7 +2,7 @@
 # CUES: acoustic stimuli (left/right) duration 1.5-8s
 
 import os
-from psychopy import data
+from psychopy import data, visual, gui, core
 
 # ------------------------------------
 # EXPERIMENT SETTINGS
@@ -52,7 +52,7 @@ data_fname = os.path.join(datapath, data_fname)
 
 # Check if all images exist
 for im in imlist:
-    im_fname = os.path.join(impath, im+sfx)
+    im_fname = os.path.join(impath, im+suffix)
     if not os.path.exists(im_fname):
         raise Exception('Image files not fond in image folder: ' + str(im))
 
@@ -63,12 +63,16 @@ for im in imlist:
 # ----------------------------------------------
 
 # Open a window
+window = visual.Window(size=scrnsize, color='black', units='pix',
+                       fullscr=False)
 
 # Define trial start text
 text = "Press spacebar to start the trial"
+start_message = visual.TextStim(window, text=text, color='red', height=20)
 
 # Define the bitmap stimuli (contents can still change)
-# Define a bubble (position and size can still change)
+bitmap1 = visual.ImagesStim(window, size=scrnsize)
+bitmap2 = visual.ImagesStim(window, size=scrnsize)
 
 # ----------------------------------------------
 # DEFINE A TRIAL SEQUENCE
@@ -81,23 +85,28 @@ text = "Press spacebar to start the trial"
 # TODO: stim_order list, orientations?
 stim_order = []
 for im in imlist:
-    stim_order.append({'im': im, 'ori': })
+    stim_order.append({'im': im})
+# 'ori': })
 
 trials = data.TrialHandler(stim_order, nReps=1, extraInfo=exp_info,
                            method='sequential', originPath=datapath)
+
+print(trials)
 
 # ----------------------------------------------
 # START THE EXPERIMENT
 # ----------------------------------------------
 
 for trial in trials:
-    # Display trial start text
+    # TODO: Display trial start text
 
-    # Wait for a spacebar press to start trial or escape to quit
+    # TODO: Wait for a spacebar press to start trial or escape to quit
 
-    # Set the images and orientation (?)
+    # TODO: Set the images and orientation (?)
     im_fname = os.path.join(impath, trial['im'])
     trial['ori']
+
+    # TODO: Set clocks to 0
 
     # Empty keypresses list
     key_presses = []
