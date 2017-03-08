@@ -21,12 +21,22 @@ changetime = .5                      # image changing time in seconds
 # ----------------------------------------------
 
 exp_name = 'Motor Imagery'
-exp_info = {}
+exp_info = {'participant': '',
+            'gender': ('male', 'female', 'other'),
+            'age': '',
+            'left-handed': False}
 
 # Get subject name, gender, age, handedness through a dialog box
+# (see http://www.psychopy.org/api/gui.html)
+dlg = gui.DlgFromDict(dictionary=exp_info, title=exp_name)
+
 # If 'Cancel' is pressed, quit
-# Get date and time
-# Store this information as general session info
+if not dlg.OK:
+    core.quit()
+
+# Get date and time and store this information as general session info
+exp_info['date'] = data.getDateStr()
+exp_info['exp_name'] = exp_name
 
 # Check for datapath directory
 if not os.path.isdir(datapath):
