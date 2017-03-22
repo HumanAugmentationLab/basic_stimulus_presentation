@@ -2,7 +2,8 @@
 # CUES: acoustic stimuli (left/right) duration 1.5-8s
 
 import os
-from psychopy import data, visual, gui, core
+from psychopy import data, visual, gui, core, event
+from PIL import Image
 
 # ------------------------------------
 # EXPERIMENT SETTINGS
@@ -10,7 +11,7 @@ from psychopy import data, visual, gui, core
 
 datapath = 'data'                    # directory to save data
 impath = 'images'                    # directory where images can be found
-imlist = ['left', 'right', 'cross']  # image names without suffixes
+imlist = ['left', 'right']           # image names without suffixes
 suffix = '.png'                      # suffix for images
 scrnsize = (1200, 800)               # screen size in pixels
 timelimit = 4                        # image freezing time in seconds
@@ -58,6 +59,8 @@ for im in imlist:
 
 # TODO: find a way to define a set image order
 
+orilist = [0, 0, 0]
+
 # ----------------------------------------------
 # CREATION OF WINDOW AND STIMULI
 # ----------------------------------------------
@@ -71,8 +74,8 @@ text = "Press spacebar to start the trial"
 start_message = visual.TextStim(window, text=text, color='red', height=20)
 
 # Define the bitmap stimuli (contents can still change)
-bitmap1 = visual.ImagesStim(window, size=scrnsize)
-bitmap2 = visual.ImagesStim(window, size=scrnsize)
+bitmap1 = visual.ImageStim(window, size=scrnsize)
+bitmap2 = visual.ImageStim(window, size=scrnsize)
 
 # ----------------------------------------------
 # DEFINE A TRIAL SEQUENCE
@@ -84,11 +87,10 @@ bitmap2 = visual.ImagesStim(window, size=scrnsize)
 
 # TODO: stim_order list, orientations?
 stim_order = []
-for im in imlist:
-    stim_order.append({'im': im})
-# 'ori': })
+for im, ori in zip(imlist, orilist):
+    stim_order.append({'im': im, 'ori': ori})
 
-trials = data.TrialHandler(stim_order, nReps=1, extraInfo=exp_info,
+trials = data.TrialHandler(stim_order, nReps=2, extraInfo=exp_info,
                            method='sequential', originPath=datapath)
 
 print(trials)
@@ -97,48 +99,60 @@ print(trials)
 # START THE EXPERIMENT
 # ----------------------------------------------
 
+# Initialize two clocks:
+# - for image change time
+# - for response time
+change_clock = core.Clock()
+rt_clock = core.Clock()
+trial_clock = core.Clock()
+
+event_list = []
+trial_clock.reset()
 for trial in trials:
-    # TODO: Display trial start text
+    # Display trial start text
+    start_message.draw()
+    window.flip()
 
-    # TODO: Wait for a spacebar press to start trial or escape to quit
+    # Wait for a spacebar press to start trial or escape to quit
+    keys = event.waitKeys(keyList=['space', 'escape'])
 
-    # TODO: Set the images and orientation (?)
+    # Set clocks to 0
+    change_clock.reset()
+    rt_clock.reset()
+
+    # display image for 4 seconds
+    # Set the images and orientation (?)
     im_fname = os.path.join(impath, trial['im'])
-    trial['ori']
+    bitmap1.setImage(im_fname + suffix)
+    bitmap1.setOri(trial['ori'])
+    # display image
+    bitmap1.draw()
+    window.flip()
+    # Record start-time
+    event_list.append([trial['im'], trial_clock.getTime()])
+    # Wait 4 seconds
+    core.wait(4)
 
-    # TODO: Set clocks to 0
+    # Blank screen for 2 sec
+    window.flip(clearBuffer=True)
+    # Record
+    event_list.append(['blank screen', trial_clock.getTime()])
+    # Wait 2 seconds
+    core.wait(2)
 
-    # Empty keypresses list
-    key_presses = []
+    # Fixation cross for 2 seconds
+    im_fname = os.path.join(impath, 'cross')
+    bitmap1.setImage(im_fname + suffix)
+    bitmap1.setOri(0)
+    # display cross
+    bitmap1.draw()
+    window.flip()
+    # Record
+    event_list.append(['cross', trial_clock.getTime()])
+    # Wait 2 seconds
+    core.wait(2)
 
-    # Start the trial
-
-    # Stop trial if spacebar or escape has been pressed or 30s has passed
-    while not response and time < timelimit:
-        # Switch image
-
-        # TODO: Display images
-
-        # For the duration of 'changetime,' wait for spacebar or escape press
-        while time < changetime:
-            if response:
-                break
-
-    # Aanlyze the keypress
-    if response:
-        if escape_pressed:
-            # Escape press = quit the experiment
-            break
-        elif spacebar_pressed:
-            # Spacebar press = correct change detection; register response time
-            # ???????
-            acc = 1
-            rt = timelimit
-
-    # Add the current trial's data to TrialHandler
-    trials.addData('rt', rt)
-    trials.addData('acc', acc)
-
+    print(event_list)
     # Advance to the next trial
 
 # ----------------------------------------------

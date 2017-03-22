@@ -1,0 +1,5 @@
+date,exp_name,left-handed,age,gender,participant,TrialNumber,im,ori,ran,order
+2017_Mar_22_1608,Motor Imagery,False,,male,,1,left,0,1.0,0.0
+2017_Mar_22_1608,Motor Imagery,False,,male,,2,right,0,1.0,1.0
+2017_Mar_22_1608,Motor Imagery,False,,male,,3,left,0,1.0,2.0
+2017_Mar_22_1608,Motor Imagery,False,,male,,4,right,0,1.0,3.0
