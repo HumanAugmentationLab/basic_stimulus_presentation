@@ -3,7 +3,6 @@
 
 import os
 from psychopy import data, visual, gui, core, event
-from PIL import Image
 # ------------------------------------
 # EXPERIMENT SETTINGS
 # ------------------------------------
@@ -11,15 +10,15 @@ from PIL import Image
 
 class Experiment:
     def __init__(self):
-        self.datapath = 'data'                    # directory to save data
-        self.impath = 'images'                    # directory where images can be found
-        self.imlist = ['left', 'right']           # image names without suffixes
-        self.suffix = '.png'                      # suffix for images
-        self.scrnsize = (1200, 800)               # screen size in pixels
-        self.timelimit = 4                        # image freezing time in seconds
-        self.changetime = .5                      # image changing time in seconds
-        self.num_trials = 6                       # number of trials before break
-        self.break_time = 15                      # number of seconds for break
+        self.datapath = 'data'            # directory to save data
+        self.impath = 'images'            # directory where images can be found
+        self.imlist = ['left', 'right']   # image names without suffixes
+        self.suffix = '.png'              # suffix for images
+        self.scrnsize = (1200, 800)       # screen size in pixels
+        self.timelimit = 4                # image freezing time in seconds
+        self.changetime = .5              # image changing time in seconds
+        self.num_trials = 6               # number of trials before break
+        self.break_time = 15              # number of seconds for break
         self.event_list = []
         self.trial_clock = core.Clock()
 
@@ -27,30 +26,30 @@ class Experiment:
 # STORE INFORMATION ABOUT THE EXPERIMENT SESSION
 # ----------------------------------------------
     def store_info(self, exp_name):
-        exp_info = {'participant': '',
-                    'gender': ('male', 'female', 'other'),
-                    'age': '',
-                    'left-handed': False}
+        self.exp_info = {'participant': '',
+                         'gender': ('male', 'female', 'other'),
+                         'age': '',
+                         'left-handed': False}
 
         # Get subject name, gender, age, handedness through a dialog box
         # (see http://www.psychopy.org/api/gui.html)
-        dlg = gui.DlgFromDict(dictionary=exp_info, title=exp_name)
+        dlg = gui.DlgFromDict(dictionary=self.exp_info, title=exp_name)
 
         # If 'Cancel' is pressed, quit
         if not dlg.OK:
             core.quit()
 
         # Get date and time and store this information as general session info
-        exp_info['date'] = data.getDateStr()
-        exp_info['exp_name'] = exp_name
+        self.exp_info['date'] = data.getDateStr()
+        self.exp_info['exp_name'] = exp_name
 
         # Check for datapath directory
         if not os.path.isdir(self.datapath):
             os.makedirs(self.datapath)
 
         # Create a unique filename for the experiment data
-        data_fname = exp_info['participant'] + '_' + exp_info['date']
-        data_fname = os.path.join(datapath, data_fname)
+        data_fname = self.exp_info['participant'] + '_' + self.exp_info['date']
+        data_fname = os.path.join(self.datapath, data_fname)
 
 # ----------------------------------------------
 # PREPARE CONDTIONS LIST
@@ -59,29 +58,31 @@ class Experiment:
     def prep_cond_list(self):
         # Check if all images exist
         for im in self.imlist:
-            im_fname = os.path.join(impath, im+suffix)
+            im_fname = os.path.join(self.impath, im + self.suffix)
             if not os.path.exists(im_fname):
-                raise Exception('Image files not fond in image folder: ' + str(im))
+                raise Exception('Image files not fond in image folder: '
+                                + str(im))
 
         # TODO: find a way to define a set image order
 
-        orilist = [0, 0, 0]
+        self.orilist = [0, 0, 0]
 
 # ----------------------------------------------
 # CREATION OF WINDOW AND STIMULI
 # ----------------------------------------------
     def make_window(self):
         # Open a window
-        window = visual.Window(size=scrnsize, color='black', units='pix',
+        self.window = visual.Window(size=self.scrnsize, color='black', units='pix',
                                fullscr=False)
 
         # Define trial start text
         text = "Press spacebar to start the trial"
-        start_message = visual.TextStim(window, text=text, color='red', height=20)
+        self.start_message = visual.TextStim(self.window, text=text,
+                                             color='red', height=20)
 
         # Define the bitmap stimuli (contents can still change)
-        bitmap1 = visual.ImageStim(window, size=scrnsize)
-        bitmap2 = visual.ImageStim(window, size=scrnsize)`
+        self.bitmap1 = visual.ImageStim(self.window, size=self.scrnsize)
+        self.bitmap2 = visual.ImageStim(self.window, size=self.scrnsize)
 
 # ----------------------------------------------
 # DEFINE A TRIAL SEQUENCE
@@ -94,12 +95,14 @@ class Experiment:
 # TODO: stim_order list, orientations?
     def make_trial_seq(self):
         stim_order = []
-        for im, ori in zip(imlist, orilist):
+        for im, ori in zip(self.imlist, self.orilist):
             stim_order.append({'im': im, 'ori': ori})
         print(stim_order)
 
-        self.trials = data.TrialHandler(stim_order, nReps=2, extraInfo=exp_info,
-                                        method='sequential', originPath=datapath)
+        self.trials = data.TrialHandler(stim_order, nReps=2,
+                                        extraInfo=self.exp_info,
+                                        method='sequential',
+                                        originPath=self.datapath)
 
         print(self.trials)
 
@@ -114,32 +117,32 @@ class Experiment:
         '''displays image (im_name) on screen with orientation (ori) in degrees,
         and leaves it on the screen for (duration) in seconds'''
         im_fname = os.path.join(self.impath, im_name)
-        bitmap1.setImage(im_fname + suffix)
-        bitmap1.setOri(ori)
+        self.bitmap1.setImage(im_fname + self.suffix)
+        self.bitmap1.setOri(ori)
         # display image
-        bitmap1.draw()
-        window.flip()
+        self.bitmap1.draw()
+        self.window.flip()
         # Record start-time
-        self.event_list.append([im_name, trial_clock.getTime()])
+        self.event_list.append([im_name, self.trial_clock.getTime()])
         # Wait 4 seconds
         core.wait(duration)
 
-    def blank_screen(duration=0):
-        window.flip(clearBuffer=True)
+    def blank_screen(self, duration=0):
+        self.window.flip(clearBuffer=True)
         # Record
-        self.event_list.append(['blank screen', trial_clock.getTime()])
+        self.event_list.append(['blank screen', self.trial_clock.getTime()])
         # Wait 2 seconds
         core.wait(duration)
 
     def run_trial(self):
-        trial_clock.reset()
+        self.trial_clock.reset()
         for trial in self.trials:
             # Display trial start text
-            start_message.draw()
-            window.flip()
+            self.start_message.draw()
+            self.window.flip()
 
             # Wait for a spacebar press to start trial or escape to quit
-            keys = event.waitKeys(keyList=['space', 'escape'])
+            self.keys = event.waitKeys(keyList=['space', 'escape'])
 
             # display image for 4 seconds
             self.disp_im(trial['im'], ori=trial['ori'], duration=4)
@@ -149,10 +152,9 @@ class Experiment:
 
             # Fixation cross for 2 seconds
             self.disp_im('cross', duration=2)
-            im_fname = os.path.join(impath, 'cross')
 
-            self.trials.addData('event times', event_list)
-            print(event_list)
+            self.trials.addData('event times', self.event_list)
+            print(self.event_list)
             # Advance to the next trial
 
 # ----------------------------------------------
@@ -161,7 +163,7 @@ class Experiment:
 
 # Save all data to a file
     def save_data(self):
-        self.trials.saveAsWideText(data_fname + '.csv', delim=',')
+        self.trials.saveAsWideText(self.data_fname + '.csv', delim=',')
 
 # Quit the experiment
 
@@ -174,3 +176,8 @@ class Experiment:
     def run_experiment(self):
         self.prep_exp()
         self.run_trial()
+
+
+if __name__ == "__main__":
+    exp = Experiment()
+    exp.run_experiment()
