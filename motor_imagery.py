@@ -12,7 +12,6 @@ class Experiment:
     def __init__(self):
         self.datapath = 'data'            # directory to save data
         self.impath = 'images'            # directory where images can be found
-        self.imlist = ['left', 'right']   # image names without suffixes
         self.suffix = '.png'              # suffix for images
         self.scrnsize = (1200, 800)       # screen size in pixels
         self.timelimit = 4                # image freezing time in seconds
@@ -25,6 +24,17 @@ class Experiment:
 # ----------------------------------------------
 # STORE INFORMATION ABOUT THE EXPERIMENT SESSION
 # ----------------------------------------------
+    def set_imlist(self, trial_duration, num_trials=1):
+        '''makes the trial the correct duration'''
+        self.imlist = []
+        trial_number = trial_duration // 8
+        for n in range(num_trials):
+            trial_list = []
+            for i in range(trial_number):
+                trial_list.append('left')
+                trial_list.append('right')
+            self.imlist.append(trial_list)
+
     def store_info(self, exp_name):
         self.exp_info = {'participant': '',
                          'gender': ('male', 'female', 'other'),
@@ -58,10 +68,12 @@ class Experiment:
     def prep_cond_list(self):
         # Check if all images exist
         for im in self.imlist:
-            im_fname = os.path.join(self.impath, im + self.suffix)
-            if not os.path.exists(im_fname):
-                raise Exception('Image files not fond in image folder: '
-                                + str(im))
+            for i in im:
+                print(i)
+                im_fname = os.path.join(self.impath, i + self.suffix)
+                if not os.path.exists(im_fname):
+                    raise Exception('Image files not fond in image folder: '
+                                    + str(im))
 
         # TODO: find a way to define a set image order
 
@@ -73,7 +85,7 @@ class Experiment:
     def make_window(self):
         # Open a window
         self.window = visual.Window(size=self.scrnsize, color='black', units='pix',
-                               fullscr=False)
+                                    fullscr=False)
 
         # Define trial start text
         text = "Press spacebar to start the trial"
@@ -140,22 +152,24 @@ class Experiment:
             # Display trial start text
             self.start_message.draw()
             self.window.flip()
-
             # Wait for a spacebar press to start trial or escape to quit
             self.keys = event.waitKeys(keyList=['space', 'escape'])
+            
+            for im in trial['im']:
 
-            # display image for 4 seconds
-            self.disp_im(trial['im'], ori=trial['ori'], duration=4)
 
-            # Blank screen for 2 sec
-            self.blank_screen(duration=2)
+                # display image for 4 seconds
+                self.disp_im(im, ori=trial['ori'], duration=4)
 
-            # Fixation cross for 2 seconds
-            self.disp_im('cross', duration=2)
+                # Blank screen for 2 sec
+                self.blank_screen(duration=2)
 
-            self.trials.addData('event times', self.event_list)
-            print(self.event_list)
-            # Advance to the next trial
+                # Fixation cross for 2 seconds
+                self.disp_im('cross', duration=2)
+
+                self.trials.addData('event times', self.event_list)
+                print(self.event_list)
+                # Advance to the next trial
 
 # ----------------------------------------------
 # END THE EXPERIMENT
@@ -168,6 +182,7 @@ class Experiment:
 # Quit the experiment
 
     def prep_exp(self):
+        self.set_imlist(trial_duration=200)
         self.store_info('Motor Imagery')
         self.prep_cond_list()
         self.make_window()
